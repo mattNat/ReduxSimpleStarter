@@ -15,7 +15,7 @@ class SearchBar extends Component {
     // call on parent method with super
     super(props);
     // initialize with new object with properties we want to record on state
-    this.state = { term: '' };
+    this.state = { term: 'Starting Value' };
   }
 
   render() {
@@ -25,7 +25,10 @@ class SearchBar extends Component {
     return (
       // always manipulate state like this
       <div>
-        <input onChange={event => this.setState({ term: event.target.value })} />
+        <input 
+          // turn into a controlled component
+          value={this.state.term}
+          onChange={event => this.setState({ term: event.target.value })} />
         {/* Value of the input: {this.state.term} */}
       </div>
     );
