@@ -1,9 +1,11 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import YTSearch from 'youtube-api-search';
 
 import SearchBar from './components/search_bar';
 import VideoList from './components/video_list'
+import VideoDetail from './components/video_detail'
 
 const API_KEY = 'AIzaSyDlNXT6U3rbExS2kiZj_gBzkyHD8h81d2E';
 
@@ -16,21 +18,36 @@ class App extends Component {
     super(props);
     
     this.state = {
-      videos: []
+      videos: [],
+      selectedVideo: null
     }
 
-    YTSearch({key: API_KEY, term: 'surfboards'}, (videos) => {
-      this.setState({ videos });
-    });
+    this.videoSearch('surfboards');
   }
   
+  // ability to search for new videos, hookup search bar
+  videoSearch(term) {
+    YTSearch({key: API_KEY, term: term}, (videos) => {
+      this.setState({ 
+        videos: videos,
+        selectedVideo: videos[0]
+      });
+    });
+  }
 
   render() {
+    // debounce: takes inner function and returns new function that can only be called once every X milli=seconds
+    // good way to throttle user input
+    const videoSearch = _.debounce(term => {this.videoSearch(term)}, 300)
+
     // some JSX gets transpiled to vanilla JS
     return (
     <div>
-      <SearchBar />
-      <VideoList videos={this.state.videos} />
+      <SearchBar onSearchTermChange={videoSearch} />
+      <VideoDetail video={this.state.selectedVideo}/>
+      <VideoList 
+        onVideoSelect={selectedVideo =>  this.setState({selectedVideo})}
+        videos={this.state.videos} />
     </div>
     );
   }
